@@ -55,17 +55,7 @@ module TestQueue
         key = suite.respond_to?(:id) ? suite.id : suite.to_s
 
         caps_array.each do |caps|
-          # set caps method on each example
-          case suite.to_s
-            when /RSpec::Core::Example:/
-              set_caps(suite, caps)
-            when /RSpec::ExampleGroups::/
-              suite.descendant_filtered_examples.each { |ex| set_caps(ex, caps) }
-            else
-              fail "Unknown RSpec class #{suite}"
-          end
-
-          hash.update "#{key}#{caps.to_s}" => suite
+          hash.update "#{key}#{caps.to_s}" => set_caps(suite, caps)
         end
 
         hash
