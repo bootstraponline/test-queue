@@ -25,19 +25,6 @@ module TestQueue
   class Runner
     attr_accessor :concurrency
 
-    # Sets the desired capabilities on an RSpec::Core::Example instance
-    def set_caps obj, caps
-      obj_dup = obj.dup
-
-      obj_dup.instance_eval <<-RUBY
-        def caps
-          #{caps}
-        end
-      RUBY
-
-      obj_dup
-    end
-
     def initialize(queue, concurrency=nil, socket=nil, relay=nil)
       raise ArgumentError, 'array required' unless Array === queue
 
@@ -55,7 +42,15 @@ module TestQueue
         key = suite.respond_to?(:id) ? suite.id : suite.to_s
 
         caps_array.each do |caps|
-          hash.update "#{key}#{caps.to_s}" => set_caps(suite, caps)
+          # must return a duplicate object or the same caps will be used across all tests.
+          suite_with_caps = suite.dup
+          suite_with_caps.instance_eval <<-RUBY
+            def caps
+              #{caps}
+            end
+          RUBY
+
+          hash.update "#{key}#{caps.to_s}" => suite_with_caps
         end
 
         hash
