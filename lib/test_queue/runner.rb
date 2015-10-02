@@ -28,7 +28,7 @@ module TestQueue
     # Sets the desired capabilities on an RSpec::Core::Example instance
     def set_caps obj, caps
       old_to_s = obj.to_s
-      obj_dup = obj.dup
+      obj_dup  = obj.dup
 
       obj_dup.instance_eval <<-RUBY
         def caps
@@ -53,10 +53,51 @@ module TestQueue
         queue.sort_by! { |s| forced.index(s.to_s) }
       end
 
+
+      #binding.pry; exit
+
+
       caps_array = SauceRSpec.config.caps
 
-      @procline = $0
-      @suites   = queue.inject(Hash.new) do |hash, suite|
+      count = 0
+
+
+      filtered_examples = ::RSpec.world.filtered_examples
+
+      filtered_examples.keys.each do |key|
+        examples_with_caps = []
+
+        filtered_examples[key].each do |ex|
+          caps_array.each do |caps|
+            old_to_s    = ex.to_s
+            ex_with_cap = ex.dup
+            ex_with_cap.instance_variable_set(:@id, ex_with_cap.id + caps.to_s)
+
+            ex_with_cap.instance_eval <<-RUBY
+        def caps
+          #{caps}
+        end
+
+        def to_s
+          %q(#{old_to_s})
+        end
+            RUBY
+
+            examples_with_caps << ex_with_cap
+          end
+        end
+
+        # for each example, add all the caps
+
+
+        filtered_examples[key] = examples_with_caps
+      end
+
+
+      binding.pry; exit
+
+      @procline  = $0
+      @suites    = queue.inject(Hash.new) do |hash, suite|
         key = suite.respond_to?(:id) ? suite.id : suite.to_s
 
         caps_array.each do |caps|
@@ -66,8 +107,8 @@ module TestQueue
               suite = set_caps(suite, caps)
             when /RSpec::ExampleGroups::/
               new_examples = suite.descendant_filtered_examples.map { |ex| set_caps(ex, caps) }
-              old_to_s = suite.to_s
-              suite = suite.dup
+              old_to_s     = suite.to_s
+              suite        = suite.dup
               suite.instance_eval "def to_s; %q(#{old_to_s}); end"
               suite.instance_variable_set(:@descendant_filtered_examples, new_examples)
             else
@@ -80,7 +121,7 @@ module TestQueue
         hash
       end
 
-      binding.pry; exit
+      # binding.pry; exit
       # @suites.values.map(&:caps)
       # @suites.values.map(&:descendant_filtered_examples).flatten.map(&:caps)
 
