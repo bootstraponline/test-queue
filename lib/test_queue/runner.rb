@@ -62,12 +62,12 @@ module TestQueue
       count = 0
 
 
-      filtered_examples = ::RSpec.world.filtered_examples
+      all_example_groups = ::RSpec.world.all_example_groups
 
-      filtered_examples.keys.each do |key|
+      all_example_groups.each do |group|
         examples_with_caps = []
 
-        filtered_examples[key].each do |ex|
+        group.examples.each do |ex|
           caps_array.each do |caps|
             old_to_s    = ex.to_s
             ex_with_cap = ex.dup
@@ -88,13 +88,11 @@ module TestQueue
         end
 
         # for each example, add all the caps
-
-
-        filtered_examples[key] = examples_with_caps
+        group.instance_variable_set(:@examples, examples_with_caps)
       end
 
 
-      binding.pry; exit
+      # binding.pry; exit
 
       @procline  = $0
       @suites    = queue.inject(Hash.new) do |hash, suite|
