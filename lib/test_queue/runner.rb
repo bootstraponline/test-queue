@@ -25,6 +25,24 @@ module TestQueue
   class Runner
     attr_accessor :concurrency
 
+    # Sets the desired capabilities on an RSpec::Core::Example instance
+    def set_caps obj, caps
+      old_to_s = obj.to_s
+      obj_dup = obj.dup
+
+      obj_dup.instance_eval <<-RUBY
+        def caps
+          #{caps}
+        end
+
+        def to_s
+          %q(#{old_to_s})
+        end
+      RUBY
+
+      obj_dup
+    end
+
     def initialize(queue, concurrency=nil, socket=nil, relay=nil)
       raise ArgumentError, 'array required' unless Array === queue
 
@@ -42,15 +60,21 @@ module TestQueue
         key = suite.respond_to?(:id) ? suite.id : suite.to_s
 
         caps_array.each do |caps|
-          # must return a duplicate object or the same caps will be used across all tests.
-          suite_with_caps = suite.dup
-          suite_with_caps.instance_eval <<-RUBY
-            def caps
-              #{caps}
-            end
-          RUBY
+          # set caps method on each example
+          case suite.to_s
+            when /RSpec::Core::Example:/
+              suite = set_caps(suite, caps)
+            when /RSpec::ExampleGroups::/
+              new_examples = suite.descendant_filtered_examples.map { |ex| set_caps(ex, caps) }
+              old_to_s = suite.to_s
+              suite = suite.dup
+              suite.instance_eval "def to_s; %q(#{old_to_s}); end"
+              suite.instance_variable_set(:@descendant_filtered_examples, new_examples)
+            else
+              fail "Unknown RSpec class #{suite}"
+          end
 
-          hash.update "#{key}#{caps.to_s}" => suite_with_caps
+          hash.update "#{key}#{caps.to_s}" => suite
         end
 
         hash
