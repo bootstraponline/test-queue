@@ -1,7 +1,15 @@
-## test-queue
+## test-queue-patched
 
 [![Gem Version](https://badge.fury.io/rb/test-queue.svg)](https://rubygems.org/gems/test-queue)
 [![Build Status](https://travis-ci.org/tmm1/test-queue.svg?branch=master)](https://travis-ci.org/tmm1/test-queue)
+
+### patches
+
+`test-queue-patched` is the upstream test-queue master branch with the following patches applied:
+
+- `git am -3 https://github.com/tmm1/test-queue/pull/73`
+
+---
 
 Yet another parallel test runner, built using a centralized queue to ensure
 optimal distribution of tests between workers.
