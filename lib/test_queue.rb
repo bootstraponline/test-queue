@@ -1,3 +1,5 @@
+$stdout.sync = $stderr.sync = true
+
 if !IO.respond_to?(:binread)
   class << IO
     alias :binread :read

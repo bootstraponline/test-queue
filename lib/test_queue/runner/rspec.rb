@@ -26,6 +26,14 @@ module TestQueue
         worker.summary  = worker.lines.grep(/ examples?, /).first
         worker.failure_output = worker.output[/^Failures:\n\n(.*)\n^Finished/m, 1]
       end
+
+      # clean exit to make sure at_exit {} hooks run (used by simplecov)
+      # https://github.com/instructure/canvas-lms/blob/039207c04faa67503633e4caf554dbc49cc78549/script/rspec-queue#L43
+      def summarize
+        estatus = @completed.inject(0) { |s, worker| s + (worker.status.exitstatus || 1) }
+        estatus = [estatus, 255].min
+        exit estatus
+      end
     end
   end
 
