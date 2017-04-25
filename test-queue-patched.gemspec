@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'test-queue-patched'
-  s.version = '0.4.3'
+  s.version = '0.4.4'
   s.summary = 'parallel test runner'
   s.description = 'minitest/rspec parallel test runner for CI environments'
 
