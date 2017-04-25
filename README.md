@@ -1,7 +1,6 @@
 ## test-queue-patched
 
-[![Gem Version](https://badge.fury.io/rb/test-queue.svg)](https://rubygems.org/gems/test-queue)
-[![Build Status](https://travis-ci.org/tmm1/test-queue.svg?branch=master)](https://travis-ci.org/tmm1/test-queue)
+[![Gem Version](https://badge.fury.io/rb/test-queue-patched.svg)](https://rubygems.org/gems//test-queue-patched)
 
 ### patches
 
