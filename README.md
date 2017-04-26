@@ -1,6 +1,6 @@
 ## test-queue-patched
 
-[![Gem Version](https://badge.fury.io/rb/test-queue-patched.svg)](https://rubygems.org/gems//test-queue-patched)
+[![Gem Version](https://badge.fury.io/rb/test-queue-patched.svg)](https://rubygems.org/gems/test-queue-patched)
 
 ### patches
 
