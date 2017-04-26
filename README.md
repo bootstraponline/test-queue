@@ -6,7 +6,16 @@
 
 `test-queue-patched` is the upstream test-queue master branch with the following patches applied:
 
-- `git am -3 https://github.com/tmm1/test-queue/pull/73`
+- `Fix deprecated rspec methods`
+  - `git am -3 https://github.com/tmm1/test-queue/pull/73`
+- `$stdout.sync = $stderr.sync = true`
+
+[`RSpec < Runner`](lib/test_queue/runner/rspec.rb) now:
+ - Loads `::RSpec::Core::RubyProject.root/spec/spec_helper` on init
+ - Exits with `exit` instead of `exit!` so that `at_exit` hooks run (required for simplecov)
+ - Sets `ENV['TEST_ENV_NUMBER']` in `after_fork`
+
+Improvements inspired by [canvas-lms test-queue](https://github.com/instructure/canvas-lms/blob/039207c04faa67503633e4caf554dbc49cc78549/script/rspec-queue#L43)
 
 ---
 
