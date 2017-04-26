@@ -14,12 +14,15 @@ module TestQueue
   class Runner
     class RSpec < Runner
       def initialize
+        # Require spec helper immediately
+        require File.join(::RSpec::Core::RubyProject.root,  'spec', 'spec_helper')
         super(TestFramework::RSpec.new)
       end
 
       def run_worker(iterator)
         rspec = ::RSpec::Core::QueueRunner.new
-        rspec.run_each(iterator).to_i
+        # Save worker return value so we can exit in cleanup_worker
+        @run_worker_exit_code = rspec.run_each(iterator).to_i
       end
 
       def summarize_worker(worker)
@@ -28,11 +31,22 @@ module TestQueue
       end
 
       # clean exit to make sure at_exit {} hooks run (used by simplecov)
+      # test-queue will invoke exit! by default which doesn't run at_exit
       # https://github.com/instructure/canvas-lms/blob/039207c04faa67503633e4caf554dbc49cc78549/script/rspec-queue#L43
       def summarize
         estatus = @completed.inject(0) { |s, worker| s + (worker.status.exitstatus || 1) }
         estatus = [estatus, 255].min
         exit estatus
+      end
+
+      # set env number for simplecov
+      def after_fork(num)
+        ENV['TEST_ENV_NUMBER'] = num > 1 ? num.to_s : ''
+      end
+
+      # clean exit to make sure at_exit {} hooks run (used by simplecov)
+      def cleanup_worker
+        Kernel.exit @run_worker_exit_code || 0
       end
     end
   end
