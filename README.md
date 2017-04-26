@@ -19,7 +19,7 @@ Improvements inspired by [canvas-lms test-queue](https://github.com/instructure/
 
 ### debugging note
 
-To debug test-queue, [stdout and stderr redirection](lib/test_queue/runner.rb) may be commented out.
+To debug test-queue, [stdout and stderr redirection](lib/test_queue/runner.rb#L387) may be commented out.
 
 ```ruby
 # $stdout.reopen(output)
