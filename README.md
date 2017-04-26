@@ -17,6 +17,15 @@
 
 Improvements inspired by [canvas-lms test-queue](https://github.com/instructure/canvas-lms/blob/039207c04faa67503633e4caf554dbc49cc78549/script/rspec-queue#L43)
 
+### debugging note
+
+To debug test-queue, [stdout and stderr redirection](lib/test_queue/runner.rb) may be commented out.
+
+```ruby
+# $stdout.reopen(output)
+# $stderr.reopen($stdout)
+```
+
 ---
 
 Yet another parallel test runner, built using a centralized queue to ensure
